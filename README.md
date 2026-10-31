@@ -9,6 +9,24 @@ A Lazarus port of two Delphi SynEdit units that Lazarus SynEdit does not provide
 
 The class names, component names, form layout and public API match the Delphi originals, so existing Delphi code keeps working with only minor changes.
 
+## Screenshots
+
+*Captured with the demo on Linux (GTK2); on Windows the dialogs use the native Windows look.*
+
+### Editor options window
+
+| Display | Options | Keystrokes |
+|:-------:|:-------:|:----------:|
+| ![Display tab](Screenshots/options-display.png) | ![Options tab](Screenshots/options-options.png) | ![Keystrokes tab](Screenshots/options-keystrokes.png) |
+
+System colors popup of the gutter and right edge color buttons:
+
+![Color popup](Screenshots/options-color-popup.png)
+
+### Highlighter colors window
+
+![Color dialog](Screenshots/color-dialog.png)
+
 ## Contents
 
 ```
@@ -18,6 +36,7 @@ SynDialogs/
 ├── .gitignore                        Lazarus build output (lib/, backup/, *.res, *.lps…)
 ├── SynEditOptionsDialog.pas / .lfm   Editor options window
 ├── SynColorDialogForm.pas / .lfm     Highlighter colors window
+├── Screenshots/                      Images used in this README
 └── Demo/
     ├── SynDialogsDemo.lpi / .lpr     Demo project
     └── uDemo.pas / .lfm              SynEdit + Pascal highlighter + 2 buttons
