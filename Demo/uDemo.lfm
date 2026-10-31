@@ -1,0 +1,55 @@
+object frmDemo: TfrmDemo
+  Left = 300
+  Top = 200
+  Width = 700
+  Height = 450
+  Caption = 'SynEdit dialogs demo'
+  Position = poScreenCenter
+  OnCreate = FormCreate
+  object pnlTop: TPanel
+    Left = 0
+    Top = 0
+    Width = 700
+    Height = 36
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 0
+    object btnOptions: TButton
+      Left = 8
+      Top = 6
+      Width = 120
+      Height = 25
+      Caption = 'Options...'
+      OnClick = btnOptionsClick
+      TabOrder = 0
+    end
+    object btnColors: TButton
+      Left = 136
+      Top = 6
+      Width = 120
+      Height = 25
+      Caption = 'Colors...'
+      OnClick = btnColorsClick
+      TabOrder = 1
+    end
+  end
+  object SynEdit1: TSynEdit
+    Left = 0
+    Top = 36
+    Width = 700
+    Height = 414
+    Align = alClient
+    Font.Height = -13
+    Font.Name = 'Courier New'
+    Font.Pitch = fpFixed
+    Font.Quality = fqNonAntialiased
+    ParentColor = False
+    ParentFont = False
+    TabOrder = 1
+    Highlighter = SynPasSyn1
+  end
+  object SynPasSyn1: TSynPasSyn
+    Left = 600
+    Top = 8
+  end
+end
