@@ -1,0 +1,7 @@
+lib/
+backup/
+*.res
+*.lps
+*.exe
+*.dbg
+Demo/SynDialogsDemo
