@@ -13,6 +13,9 @@ The class names, component names, form layout and public API match the Delphi or
 
 ```
 SynDialogs/
+├── README.md
+├── LICENSE                           Mozilla Public License 1.1
+├── .gitignore                        Lazarus build output (lib/, backup/, *.res, *.lps…)
 ├── SynEditOptionsDialog.pas / .lfm   Editor options window
 ├── SynColorDialogForm.pas / .lfm     Highlighter colors window
 └── Demo/
@@ -162,4 +165,9 @@ Open `Demo/SynDialogsDemo.lpi`, build and run. The form contains a SynEdit with 
 
 ## License
 
-The original Delphi units are part of the SynEdit project, dual-licensed under the Mozilla Public License 1.1 and the GNU GPL 2 or later. This port is distributed under the same terms.
+The original Delphi units are part of the SynEdit project, dual-licensed under the Mozilla Public License 1.1 and the GNU General Public License 2 or later. This port is distributed under the same terms:
+
+- **MPL 1.1**: see the [LICENSE](LICENSE) file.
+- **GPL 2 or later**: you may instead use these files under the GPL, as stated in the header of each unit.
+
+The software is provided "AS IS", without warranty of any kind.
