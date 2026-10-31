@@ -1,0 +1,146 @@
+object frmSynColorDialog: TfrmSynColorDialog
+  Left = 598
+  Top = 299
+  BorderStyle = bsDialog
+  ClientHeight = 355
+  ClientWidth = 505
+  Color = clBtnFace
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Position = poScreenCenter
+  OnDestroy = FormDestroy
+  object Label1: TLabel
+    Left = 10
+    Top = 7
+    Caption = '&Element:'
+    FocusControl = ListBox1
+    ParentColor = False
+  end
+  object ListBox1: TListBox
+    Left = 10
+    Top = 22
+    Width = 145
+    Height = 100
+    ItemHeight = 0
+    TabOrder = 0
+    OnClick = ListBox1Click
+  end
+  object SynEdit1: TSynEdit
+    Left = 165
+    Top = 22
+    Width = 329
+    Height = 295
+    Font.Height = -13
+    Font.Name = 'Courier New'
+    Font.Pitch = fpFixed
+    Font.Quality = fqNonAntialiased
+    ParentColor = False
+    ParentFont = False
+    TabOrder = 1
+    Gutter.Width = 0
+    Gutter.Visible = False
+    RightGutter.Width = 0
+    ReadOnly = True
+    Options = [eoAutoIndent, eoBracketHighlight, eoGroupUndo, eoNoCaret, eoScrollPastEol, eoSmartTabs, eoTabsToSpaces, eoTrimTrailingSpaces]
+  end
+  object Label2: TLabel
+    Left = 10
+    Top = 128
+    Caption = '&Foreground Color:'
+    FocusControl = ColorBox1
+    ParentColor = False
+  end
+  object ColorBox1: TColorBox
+    Left = 10
+    Top = 144
+    Width = 145
+    Height = 22
+    Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbCustomColor, cbPrettyNames]
+    ItemHeight = 16
+    TabOrder = 2
+    OnChange = ColorBox1Change
+    OnKeyDown = ColorBox1KeyDown
+  end
+  object Label3: TLabel
+    Left = 10
+    Top = 173
+    Caption = 'B&ackground Color:'
+    FocusControl = ColorBox2
+    ParentColor = False
+  end
+  object ColorBox2: TColorBox
+    Left = 10
+    Top = 189
+    Width = 145
+    Height = 22
+    Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbCustomColor, cbPrettyNames]
+    ItemHeight = 16
+    TabOrder = 3
+    OnChange = ColorBox2Change
+    OnKeyDown = ColorBox1KeyDown
+  end
+  object GroupBox1: TGroupBox
+    Left = 10
+    Top = 217
+    Width = 145
+    Height = 100
+    Caption = ' Text attributes '
+    TabOrder = 4
+    object CheckBox1: TCheckBox
+      Left = 9
+      Top = 4
+      Width = 46
+      Height = 17
+      Caption = '&Bold'
+      TabOrder = 0
+      OnClick = CheckBox1Click
+    end
+    object CheckBox2: TCheckBox
+      Left = 9
+      Top = 23
+      Width = 46
+      Height = 17
+      Caption = '&Italic'
+      TabOrder = 1
+      OnClick = CheckBox2Click
+    end
+    object CheckBox3: TCheckBox
+      Left = 9
+      Top = 43
+      Width = 69
+      Height = 17
+      Caption = '&Underline'
+      TabOrder = 2
+      OnClick = CheckBox3Click
+    end
+    object CheckBox4: TCheckBox
+      Left = 9
+      Top = 63
+      Width = 72
+      Height = 17
+      Caption = '&Strike Out'
+      TabOrder = 3
+      OnClick = CheckBox4Click
+    end
+  end
+  object btnOK: TButton
+    Left = 326
+    Top = 325
+    Width = 75
+    Height = 25
+    Caption = '&Ok'
+    Default = True
+    ModalResult = 1
+    TabOrder = 5
+  end
+  object btnCancel: TButton
+    Left = 419
+    Top = 325
+    Width = 75
+    Height = 25
+    Cancel = True
+    Caption = '&Cancel'
+    ModalResult = 2
+    TabOrder = 6
+  end
+end
