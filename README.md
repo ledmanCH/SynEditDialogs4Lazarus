@@ -7,6 +7,8 @@ A Lazarus port of two Delphi SynEdit units that Lazarus SynEdit does not provide
 | `SynEditOptionsDialog` | Editor options (display, options, keystrokes) | `TSynEditOptionsDialog` + `TSynEditorOptionsContainer` |
 | `SynColorDialogForm` | Highlighter colors and font styles | `TSynColorDialog` |
 
+A third unit, `SynEditSettings`, saves and restores these settings in an ini file.
+
 The class names, component names, form layout and public API match the Delphi originals, so existing Delphi code keeps working with only minor changes.
 
 ## Screenshots
@@ -34,28 +36,31 @@ SynDialogs/
 ├── README.md
 ├── LICENSE                           Mozilla Public License 1.1
 ├── .gitignore                        Lazarus build output (lib/, backup/, *.res, *.lps…)
-├── SynEditOptionsDialog.pas / .lfm   Editor options window
-├── SynColorDialogForm.pas / .lfm     Highlighter colors window
+├── syneditoptionsdialog.pas / .lfm   Editor options window
+├── syncolordialogform.pas / .lfm     Highlighter colors window
+├── syneditsettings.pas               Settings saved to / loaded from an ini file
 ├── Screenshots/                      Images used in this README
 └── Demo/
     ├── SynDialogsDemo.lpi / .lpr     Demo project
-    └── uDemo.pas / .lfm              SynEdit + Pascal highlighter + 2 buttons
+    └── uDemo.pas / .lfm              Pascal and SQL editors, Options and Colors buttons, ini file
 ```
 
 ## Requirements
 
-- Lazarus 3.x or later (tested with Lazarus 3.0 / FPC 3.2.2)
+- Lazarus 3.x or later (tested with Lazarus 3.0 and 4.8 / FPC 3.2.2)
 - Packages: `SynEdit`, `LCL`
 - No third-party library (JVCL is not needed)
 
 ## Installation
 
-Copy the four unit files (`.pas` + `.lfm`) into your project folder, or add their folder to *Project Options → Compiler Options → Paths → Other unit files*. Then add the units to your `USES` clause:
+Copy the unit files (`.pas` + `.lfm`) into your project folder, or add their folder to *Project Options → Compiler Options → Paths → Other unit files*. Then add the units to your `USES` clause:
 
 ```pascal
 USES
-  SynEditOptionsDialog, SynColorDialogForm;
+  SynEditOptionsDialog, SynColorDialogForm, SynEditSettings;
 ```
+
+File names are lowercase, as usual with Lazarus: on Linux and macOS, `{$R *.lfm}` looks for the `.lfm` with exactly the same name as the `.pas`.
 
 Both units also contain a `Register` procedure (palette page **SynEdit**). You can add them to your own design-time package if you want the components on the palette; otherwise just create them in code.
 
@@ -136,12 +141,89 @@ BEGIN
 END;
 ```
 
+To edit a highlighter shared by several editors, or to choose the preview text, pass the highlighter itself. All the editors using it are updated on **OK**:
+
+```pascal
+Dlg.Execute(SynPasSyn1, 'PROGRAM Sample;' + LineEnding + 'BEGIN' + LineEnding + 'END.', SynEdit1.Font);
+```
+
+| Parameter | Description |
+|-----------|-------------|
+| `AHighlighter` | Highlighter to edit |
+| `ASample` | Preview text (optional). When empty, the highlighter sample source is shown |
+| `AFont` | Preview font (optional) |
+
 - The list on the left shows the attributes of the highlighter (comment, keyword, string, …).
 - For the selected attribute: foreground color, background color, bold, italic, underline, strike out.
 - The preview on the right is updated live.
 - **Delete** in a color combo sets the color to *None* (`clNone`, default color).
 - The highlighter is edited on a copy; it is assigned back to the editor's highlighter only on **OK**. `Execute` returns `True` on OK.
 - The window caption is `<LanguageName> Color Definitions`.
+
+### Saving the settings in an ini file
+
+`SynEditSettings` stores the highlighter colors and the editor options in readable ini sections:
+
+| Routine | Description |
+|---------|-------------|
+| `SaveHighlighter(Ini, Section, Highlighter)` | Writes `<Attribute>.Foreground`, `.Background` and `.Style` for every attribute |
+| `LoadHighlighter(Ini, Section, Highlighter)` | Reads them back; attributes missing from the ini keep their defaults |
+| `SaveEditorOptions(Ini, Section, Container)` | Writes the container (font, gutter, right edge, tabs, bookmarks, options, caret) and its keystrokes in `<Section>.Keystrokes` |
+| `LoadEditorOptions(Ini, Section, Container)` | Reads them back; returns `False` when the section does not exist |
+
+```pascal
+PROCEDURE TfrmMain.LoadSettings;
+// Highlighter colors and editor options from the ini file
+VAR
+  Ini: TIniFile;
+  Opt: TSynEditorOptionsContainer;
+  I: Integer;
+BEGIN
+  Ini := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
+  Opt := TSynEditorOptionsContainer.Create(NIL);
+  TRY
+    LoadHighlighter(Ini, 'Pascal', SynPasSyn1);
+    Opt.Assign(SynEdit1);
+    IF LoadEditorOptions(Ini, 'Editor', Opt) THEN
+      FOR I := 0 TO ComponentCount - 1 DO
+        IF Components[I] IS TSynEdit THEN
+          Opt.AssignTo(Components[I]);
+  FINALLY
+    Opt.Free;
+    Ini.Free;
+  END;
+END;
+```
+
+Saving is symmetrical: `SaveHighlighter(Ini, 'Pascal', SynPasSyn1)`, then `Opt.Assign(SynEdit1)` and `SaveEditorOptions(Ini, 'Editor', Opt)`.
+
+Resulting ini file:
+
+```ini
+[Pascal]
+Comment.Foreground=clGreen
+Comment.Background=clNone
+Comment.Style=3
+
+[Editor]
+FontName=Consolas
+FontSize=10
+TabWidth=3
+RightEdge=80
+Options=eoAutoIndent,eoBracketHighlight,eoGroupUndo,eoSmartTabs,eoTabsToSpaces,eoTrimTrailingSpaces
+Options2=eoEnhanceEndKey
+...
+
+[Editor.Keystrokes]
+0=ecUp,38,0
+1=ecSelUp,8230,0
+...
+```
+
+- Attributes are identified by their `StoredName`, which does not depend on the IDE language.
+- Colors are written by name (`clGreen`, `clNone`) or as hexadecimal (`$00FFEEDD`); `Style` is the sum Bold = 1, Italic = 2, Underline = 4, StrikeOut = 8.
+- Options are written by name: an option renamed or removed in a later Lazarus version is ignored.
+- Keystrokes are `command,shortcut1,shortcut2`; a duplicate shortcut is skipped instead of raising an error.
 
 ## Differences from the Delphi version
 
@@ -167,6 +249,10 @@ END;
 - `TSynColorDialog.Execute` created its exception without raising it; `EInvalidOperation` is now raised when the SynEdit or its highlighter is not assigned.
 - A duplicate shortcut shows an error message instead of an unhandled exception.
 
+## Lazarus 3 / 4 compatibility
+
+The `.lfm` files only contain properties that exist in both Lazarus 3 and Lazarus 4. Saving a form in the Lazarus 4 designer can add properties unknown to Lazarus 3 (for instance the gutter parts of the preview editor of the colors window, such as `MaxExtraMarksColums`). The form then fails to load with Lazarus 3 (*Unknown property*).
+
 ## Important note: SynEdit without keystrokes
 
 A `TSynEdit` loaded from an `.lfm` that does not contain a `Keystrokes` section (hand-written or converted forms) has **no keystrokes at all**: arrows, Ctrl+Home, Ctrl+C, … do nothing, and the Keystrokes tab is empty. Restore the defaults once at startup:
@@ -180,7 +266,12 @@ The demo does this in `FormCreate`.
 
 ## Demo
 
-Open `Demo/SynDialogsDemo.lpi`, build and run. The form contains a SynEdit with the Pascal highlighter and two buttons, **Options...** and **Colors...**.
+Open `Demo/SynDialogsDemo.lpi`, build and run. The form contains:
+
+- a Pascal editor and an SQL editor;
+- **Options...**: editor options, read from the first editor and applied to both;
+- **Colors...**: popup menu (Pascal, SQL) opening the colors window on the highlighter, with its own sample text;
+- `SynDialogsDemo.ini`: colors and options saved on close and restored at startup.
 
 ## License
 

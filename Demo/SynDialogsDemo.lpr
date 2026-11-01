@@ -3,7 +3,7 @@ PROGRAM SynDialogsDemo;
 {$mode delphi}{$H+}
 
 USES
-  Interfaces, Forms, uDemo, SynEditOptionsDialog, SynColorDialogForm;
+  Interfaces, Forms, uDemo;
 
 {$R *.res}
 

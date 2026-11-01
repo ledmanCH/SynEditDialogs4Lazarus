@@ -33,18 +33,22 @@
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="../SynEditOptionsDialog.pas"/>
+        <Filename Value="../syneditoptionsdialog.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="fmEditorOptionsDialog"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="../SynColorDialogForm.pas"/>
+        <Filename Value="../syncolordialogform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmSynColorDialog"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../syneditsettings.pas"/>
+        <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
   </ProjectOptions>
