@@ -1,13 +1,14 @@
 # SynDialogs for Lazarus
 
-A Lazarus port of two Delphi SynEdit units that Lazarus SynEdit does not provide:
+A Lazarus port of Delphi SynEdit units that Lazarus SynEdit does not provide:
 
-| Unit | Window | Component |
-|------|--------|-----------|
+| Unit | Window / language | Component |
+|------|-------------------|-----------|
 | `SynEditOptionsDialog` | Editor options (display, options, keystrokes) | `TSynEditOptionsDialog` + `TSynEditorOptionsContainer` |
 | `SynColorDialogForm` | Highlighter colors and font styles | `TSynColorDialog` |
+| `SynHighlighterPowerShell` | PowerShell syntax highlighter | `TSynPowerShellSyn` |
 
-A third unit, `SynEditSettings`, saves and restores these settings in an ini file.
+Another unit, `SynEditSettings`, saves and restores these settings in an ini file.
 
 The class names, component names, form layout and public API match the Delphi originals, so existing Delphi code keeps working with only minor changes.
 
@@ -39,6 +40,7 @@ SynDialogs/
 ├── syneditoptionsdialog.pas / .lfm   Editor options window
 ├── syncolordialogform.pas / .lfm     Highlighter colors window
 ├── syneditsettings.pas               Settings saved to / loaded from an ini file
+├── synhighlighterpowershell.pas      PowerShell highlighter
 ├── Screenshots/                      Images used in this README
 └── Demo/
     ├── SynDialogsDemo.lpi / .lpr     Demo project
@@ -53,16 +55,16 @@ SynDialogs/
 
 ## Installation
 
-Copy the unit files (`.pas` + `.lfm`) into your project folder, or add their folder to *Project Options → Compiler Options → Paths → Other unit files*. Then add the units to your `USES` clause:
+Copy the unit files (`.pas`, and `.lfm` for the windows) into your project folder, or add their folder to *Project Options → Compiler Options → Paths → Other unit files*. Then add the units to your `USES` clause:
 
 ```pascal
 USES
-  SynEditOptionsDialog, SynColorDialogForm, SynEditSettings;
+  SynEditOptionsDialog, SynColorDialogForm, SynEditSettings, SynHighlighterPowerShell;
 ```
 
 File names are lowercase, as usual with Lazarus: on Linux and macOS, `{$R *.lfm}` looks for the `.lfm` with exactly the same name as the `.pas`.
 
-Both units also contain a `Register` procedure (palette page **SynEdit**). You can add them to your own design-time package if you want the components on the palette; otherwise just create them in code.
+The two window units also contain a `Register` procedure (palette page **SynEdit**). You can add them to your own design-time package if you want the components on the palette; otherwise just create them in code.
 
 ## Usage
 
@@ -160,6 +162,24 @@ Dlg.Execute(SynPasSyn1, 'PROGRAM Sample;' + LineEnding + 'BEGIN' + LineEnding + 
 - The highlighter is edited on a copy; it is assigned back to the editor's highlighter only on **OK**. `Execute` returns `True` on OK.
 - The window caption is `<LanguageName> Color Definitions`.
 
+### PowerShell highlighter
+
+Port of `SynHighlighterPowerShell.pas` of [TurboPack SynEdit](https://github.com/TurboPack/SynEdit/blob/master/Source/Highlighters/SynHighlighterPowerShell.pas). It has no `Register` procedure: create it in code (it is registered with `RegisterPlaceableHighlighter`, like the other highlighters).
+
+```pascal
+PROCEDURE TfrmMain.FormCreate(Sender: TObject);
+BEGIN
+  synPowerShell := TSynPowerShellSyn.Create(Self);   // field of the form
+  SynEdit1.Highlighter := synPowerShell;
+END;
+```
+
+- **Tokens**: keywords (`function`, `param`, `foreach`…), cmdlets and functions `Verb-Noun`, variables (`$name`, `${any name}`, `$env:PATH`, `$_`, `@splat`), parameters (`-Name`), operators (`-eq`, `-and`, `-match`, `-band`…), numbers (`0x2A`, `0b101`, `1.5e3`, `10MB`), strings (`'…'`, `"…"` with backtick escapes).
+- **Multi-line constructs**: block comments `<# … #>` and here-strings `@" … "@` / `@' … '@`.
+- **Attributes** (same names and default colors as TurboPack): Comment, Identifier, Reserved word, Function (cmdlets), Variable, Special variable (parameters), Number, Space, String, Symbol, Illegal char.
+- Keywords and operators are case insensitive, like PowerShell.
+- Default filter: `PowerShell Files (*.ps1;*.psm1;*.psd1)`; the sample source is the TurboPack one, so the colors window shows it as preview.
+
 ### Saving the settings in an ini file
 
 `SynEditSettings` stores the highlighter colors and the editor options in readable ini sections:
@@ -240,6 +260,7 @@ Options2=eoEnhanceEndKey
 | `TJvColorComboBox` | JVCL | LCL `TColorBox` (standard, extended and system colors, *None*, *Custom…*). |
 | Preview text | `Highlighter.SampleSource` | Same, but when the highlighter has no sample (e.g. `TSynPasSyn` in Lazarus), the text of the edited SynEdit is shown. |
 | Bookmark options | `Assign` | Copied property by property (`TSynBookMarkOpt` has no `Assign` in Lazarus). |
+| PowerShell highlighter line | `WideChar` text | UTF-8 `PChar` given by `SetLine` (`GetToken`, `GetTokenEx` added). The bytes of non-ASCII characters are identifier characters (accented letters inside a name); a non-ASCII character starting a token is still one *Illegal char* token, as in Delphi, and covers the whole UTF-8 code point. |
 
 ### Delphi bugs fixed
 
@@ -275,7 +296,7 @@ Open `Demo/SynDialogsDemo.lpi`, build and run. The form contains:
 
 ## License
 
-The original Delphi units are part of the SynEdit project, dual-licensed under the Mozilla Public License 1.1 and the GNU General Public License 2 or later. This port is distributed under the same terms:
+The original Delphi units are part of the SynEdit project (the PowerShell highlighter comes from TurboPack SynEdit), dual-licensed under the Mozilla Public License 1.1 and the GNU General Public License 2 or later. This port is distributed under the same terms:
 
 - **MPL 1.1**: see the [LICENSE](LICENSE) file.
 - **GPL 2 or later**: you may instead use these files under the GPL, as stated in the header of each unit.
